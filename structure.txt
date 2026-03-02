@@ -1,0 +1,15 @@
+todo_app/
+│
+├── app.py
+├── models/
+│   └── task.py
+├── services/
+│   └── task_manager.py
+├── storage/
+│   └── json_storage.py
+├── templates/
+│   └── index.html
+└── data/
+    └── tasks.json
+
+    

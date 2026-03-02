@@ -1,0 +1,29 @@
+.overdue {
+    color: red;
+    font-weight: bold;
+}
+
+.task {
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    background-color: white;
+    border-left: 6px solid #ccc;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.task:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+h1::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: #007BFF;
+    margin-top: 6px;
+    border-radius: 3px;
+}
+

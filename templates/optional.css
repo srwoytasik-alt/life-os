@@ -1,0 +1,130 @@
+.priority-Critical { color: red; font-weight: bold; }
+.priority-High { color: orange; }
+.priority-Medium { color: black; }
+.priority-Low { color: gray; }
+
+.badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 0.75em;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: white;
+    margin-left: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.critical { background: linear-gradient(135deg, #c9302c, #a71d2a); }
+.high     { background: linear-gradient(135deg, #ec971f, #d58512); }
+.medium   { background: linear-gradient(135deg, #31b0d5, #269abc); }
+.low      { background: linear-gradient(135deg, #449d44, #398439); }
+
+.critical-border { border-left-color: #c9302c; }
+.high-border     { border-left-color: #ec971f; }
+.medium-border   { border-left-color: #31b0d5; }
+.low-border      { border-left-color: #449d44; }
+
+.critical-border {
+    background-color: #fff5f5;
+}
+.dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    flex: 1;
+    min-width: 160px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #f4f4f4;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+}
+
+.stat-card h3 {
+    margin: 0 0 5px 0;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.stat-card p {
+    font-size: 1.6em;
+    font-weight: bold;
+    margin: 0;
+}
+
+.progress-bar {
+    margin-top: 8px;
+    height: 8px;
+    background: #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #5cb85c, #449d44);
+    transition: width 0.3s ease;
+}
+
+.critical-card {
+    background: #fff3f3;
+    border-left: 6px solid #c9302c;
+}
+
+.high-card {
+    background: #fff8ed;
+    border-left: 6px solid #ec971f;
+}
+
+.overdue-card {
+    background: #fff0f0;
+    border-left: 6px solid #d9534f;
+}
+
+.action-btn {
+    display: inline-block;
+    margin-top: 6px;
+    margin-right: 6px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75em;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.15s ease;
+}
+
+.toggle-btn {
+    background: #e8f5ff;
+    color: #007BFF;
+}
+
+.toggle-btn:hover {
+    background: #d6ecff;
+}
+
+.delete-btn {
+    background: #ffe8e8;
+    color: #c9302c;
+}
+
+.delete-btn:hover {
+    background: #ffd6d6;
+}
+.urgency-bar {
+    margin-top: 10px;
+    height: 8px;
+    background: #eee;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.urgency-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f0ad4e, #c9302c);
+    transition: width 0.3s ease;
+}

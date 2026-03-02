@@ -1,0 +1,234 @@
+[
+    {
+        "id": 1,
+        "title": "Call Beyond Finance",
+        "priority": "Critical",
+        "due_date": "2026-03-04",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 2,
+        "title": "Refactor powerlab-toolkit",
+        "priority": "High",
+        "due_date": "2026-03-08",
+        "domain": "Career",
+        "completed": false
+    },
+    {
+        "id": 3,
+        "title": "Lock financial clarity with spouse",
+        "priority": "Medium",
+        "due_date": "2026-03-08",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 4,
+        "title": "Write requirements doc before next rebuild (Finance OS)",
+        "priority": "Medium",
+        "due_date": "2026-03-15",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 5,
+        "title": "Continue OOP fluency practice",
+        "priority": "Medium",
+        "due_date": "2026-03-29",
+        "domain": "Skill",
+        "completed": false
+    },
+    {
+        "id": 6,
+        "title": "Clean portfolio presentation",
+        "priority": "Medium",
+        "due_date": "2026-04-05",
+        "domain": "Skill",
+        "completed": false
+    },
+    {
+        "id": 7,
+        "title": "Maintain weekly review habit",
+        "priority": "High",
+        "due_date": "2026-03-08",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 8,
+        "title": "Build 555 timer multi-page calculator site",
+        "priority": "Low",
+        "due_date": "2026-04-05",
+        "domain": "Skill",
+        "completed": false
+    },
+    {
+        "id": 9,
+        "title": "Clean up / finalize Financial Dashboard OS",
+        "priority": "High",
+        "due_date": "2026-03-29",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 10,
+        "title": "Possibly email engineering manager",
+        "priority": "Critical",
+        "due_date": "2026-03-02",
+        "domain": "Career",
+        "completed": false
+    },
+    {
+        "id": 11,
+        "title": "Harden EMI/grounding knowledge (you were deep in star ground / RF immunity mode)",
+        "priority": "High",
+        "due_date": "2026-03-08",
+        "domain": "Career",
+        "completed": false
+    },
+    {
+        "id": 12,
+        "title": "Call Mom",
+        "priority": "Critical",
+        "due_date": "2026-03-04",
+        "domain": "Family",
+        "completed": false
+    },
+    {
+        "id": 13,
+        "title": "Find money",
+        "priority": "Critical",
+        "due_date": "2026-03-11",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 14,
+        "title": "Lot Rent",
+        "priority": "High",
+        "due_date": "2026-03-05",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 15,
+        "title": "Car Loan",
+        "priority": "Critical",
+        "due_date": "2026-03-01",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 16,
+        "title": "pick up diabetes medicine ",
+        "priority": "High",
+        "due_date": "2026-03-02",
+        "domain": "Health",
+        "completed": false
+    },
+    {
+        "id": 17,
+        "title": "credit card payment (beyond finance)",
+        "priority": "Medium",
+        "due_date": "2026-03-13",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 18,
+        "title": "credit card payment 2 (beyond finance)",
+        "priority": "Medium",
+        "due_date": "2026-03-27",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 19,
+        "title": "W-2 Taxes due",
+        "priority": "Critical",
+        "due_date": "2026-04-14",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 20,
+        "title": "Call Covantage (differ or push date)",
+        "priority": "Critical",
+        "due_date": "2026-03-06",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 21,
+        "title": "Call unemployment",
+        "priority": "Critical",
+        "due_date": "2026-03-04",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 22,
+        "title": "Recieve/Cash paycheck",
+        "priority": "Critical",
+        "due_date": "2026-03-28",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 23,
+        "title": "Call MEE bank about secured loan",
+        "priority": "Critical",
+        "due_date": "2026-03-04",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 24,
+        "title": "Call Valley Community CU, secured loan",
+        "priority": "Critical",
+        "due_date": "2026-03-04",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 25,
+        "title": "ask wife about parents loan $1k",
+        "priority": "Critical",
+        "due_date": "2026-03-04",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 26,
+        "title": "Pause retirement = more income",
+        "priority": "Critical",
+        "due_date": "2026-03-09",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 27,
+        "title": "Pause Holiday savings for some months",
+        "priority": "High",
+        "due_date": "2026-03-28",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 28,
+        "title": "Re-pay Brendt",
+        "priority": "High",
+        "due_date": "2026-04-01",
+        "domain": "Finance",
+        "completed": false
+    },
+    {
+        "id": 29,
+        "title": "email MEE about secured loan",
+        "priority": "High",
+        "due_date": "2026-03-04",
+        "domain": "Finance",
+        "completed": true
+    }
+]

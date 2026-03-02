@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Steve Task Control System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<h1>Steve Task Control System</h1>
+
+<section>
+    <h2>Completion & Urgency</h2>
+    <p>Completion %: {{ completion_percent }}%</p>
+    <p>Urgency (High/Critical) %: {{ urgency_percent }}%</p>
+</section>
+
+<section>
+    <a href="/?operator=true">🔥 Operator Mode (Top 5)</a>
+    <a href="/">Exit Operator Mode</a>
+</section>
+<h2>System Stability</h2>
+
+<p>
+    Stability Index:
+    <strong>{{ stability_index }} / 100</strong>
+</p>
+
+{% if stability_index >= 80 %}
+    <p style="color:green;">🟢 Stable</p>
+{% elif stability_index >= 60 %}
+    <p style="color:orange;">🟡 Moderate Pressure</p>
+{% else %}
+    <p style="color:red;">🔴 High Instability</p>
+{% endif %}
+<h2>Task List</h2>
+
+<table border="1" cellpadding="5">
+    <thead>
+        <tr>
+            <th>Task</th>
+            <th>Priority</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Domain</th>
+            <th>Score 🔥</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for task, score in scored_tasks %}
+        <tr>
+            <td>{{ task.title }}</td>
+            <td>{{ task.priority }}</td>
+            <td>{{ task.due_date }}</td>
+            <td>{{ "Complete" if task.completed else "Incomplete" }}</td>
+            <td>{{ task.domain }}</td>
+
+            <td>
+                {% if score >= 8 %}
+                    🔥🔥 {{ score }}
+                {% elif score >= 5 %}
+                    🔥 {{ score }}
+                {% else %}
+                    {{ score }}
+                {% endif %}
+            </td>
+
+            <td>
+                <a href="/toggle/{{ task.id }}">Toggle</a>
+                <a href="/delete/{{ task.id }}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>🧠 Recommended Today</h3>
+<ul>
+    {% for task in suggested_tasks %}
+        <li>{{ task.title }} - Due: {{ task.due_date }}</li>
+    {% endfor %}
+</ul>
+
+<h3>Add New Task</h3>
+<form action="/add" method="post">
+    <input type="text" name="title" placeholder="Task title" required>
+
+    <select name="priority">
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+        <option value="Critical">Critical</option>
+    </select>
+
+    <input type="date" name="due_date">
+
+    <select name="domain">
+        <option value="General">General</option>
+        <option value="Career">Career</option>
+        <option value="Finance">Finance</option>
+        <option value="Family">Family</option>
+        <option value="Skill">Skill</option>
+        <option value="Health">Health</option>
+    </select>
+
+    <button type="submit">Add</button>
+</form>
+
+</body>
+</html>

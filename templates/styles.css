@@ -1,0 +1,171 @@
+/* ===== GLOBAL ===== */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f4f6f9;
+    margin: 40px;
+    color: #222;
+}
+
+h1 {
+    font-size: 2.2em;
+    margin-bottom: 10px;
+}
+
+h1::after {
+    content: "";
+    display: block;
+    width: 70px;
+    height: 4px;
+    background: #007BFF;
+    margin-top: 8px;
+    border-radius: 3px;
+}
+
+/* ===== CONTROL PANEL ===== */
+
+.control-panel {
+    padding: 20px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+    margin-bottom: 30px;
+}
+
+/* ===== FILTER BUTTONS ===== */
+
+.filters a {
+    padding: 6px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-right: 8px;
+    font-weight: 500;
+    background: #e9ecef;
+    color: #333;
+    transition: all 0.15s ease;
+}
+
+.filters a:hover {
+    background: #dfe3e7;
+}
+
+.active-filter {
+    background: #007BFF !important;
+    color: white !important;
+}
+
+/* ===== TASK CARDS ===== */
+
+.task {
+    padding: 18px;
+    margin-bottom: 16px;
+    border-radius: 14px;
+    background: white;
+    border-left: 6px solid #ccc;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.task:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+}
+
+/* Priority Borders */
+
+.critical-border { border-left-color: #c9302c; background: #fff5f5; }
+.high-border { border-left-color: #ec971f; }
+.medium-border { border-left-color: #31b0d5; }
+.low-border { border-left-color: #449d44; }
+
+/* ===== BADGES ===== */
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: white;
+    margin-left: 10px;
+    letter-spacing: 0.5px;
+}
+
+.critical { background: #c9302c; }
+.high { background: #ec971f; }
+.medium { background: #31b0d5; }
+.low { background: #449d44; }
+
+/* ===== ACTION BUTTONS ===== */
+
+.action-btn {
+    display: inline-block;
+    margin-top: 10px;
+    margin-right: 8px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.8em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.toggle-btn {
+    background: #e7f3ff;
+    color: #007BFF;
+}
+
+.toggle-btn:hover {
+    background: #d2eaff;
+}
+
+.delete-btn {
+    background: #ffe9e9;
+    color: #c9302c;
+}
+
+.delete-btn:hover {
+    background: #ffd5d5;
+}
+
+/* ===== DASHBOARD METRICS ===== */
+
+.metric {
+    margin-bottom: 15px;
+}
+
+.progress-bar {
+    height: 10px;
+    background: #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.progress-fill {
+    height: 100%;
+    transition: width 0.4s ease;
+}
+
+.green {
+    background: linear-gradient(90deg, #5cb85c, #449d44);
+}
+
+.red {
+    background: linear-gradient(90deg, #ec971f, #c9302c);
+}
+
+/* ===== LAYOUT ===== */
+
+.main-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+.analytics-panel {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
