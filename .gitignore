@@ -4,3 +4,4 @@ instance/
 .env
 .env.*
 migrations/__pycache__/
+.DS_Store
