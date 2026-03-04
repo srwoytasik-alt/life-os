@@ -34,6 +34,8 @@ def create_app(test_config=None):
     service = TaskService(repo)
     finance_service = FinanceService()
 
+    with app.app_context():
+        db.create_all()
     # # Configure Mail
     # app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
     # app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
