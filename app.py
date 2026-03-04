@@ -12,6 +12,8 @@ from services.reminder_service import check_due_tasks
 import os
 import models
 from services.finance_service import FinanceService
+from services.backup_service import backup_tasks_to_csv
+
 
 
 def create_app(test_config=None):
@@ -79,10 +81,13 @@ def create_app(test_config=None):
         suggestions = service.get_suggestions()
         stability_index = service.get_stability_index()
 
+        mission = service.get_todays_mission()
+
         return render_template(
             "index.html",
             scored_tasks=scored_tasks,
             suggested_tasks=suggestions,
+            mission=mission,
             completion_percent=completion_percent,
             urgency_percent=urgency_percent,
             stability_index=stability_index
@@ -154,20 +159,32 @@ def create_app(test_config=None):
     # Background Scheduler
     # ---------------------
 
-    # if not app.config.get("TESTING"):
-    #     scheduler = BackgroundScheduler()
+    if not app.config.get("TESTING"):
+        scheduler = BackgroundScheduler()
 
-    #     def scheduled_job():
-    #         with app.app_context():
-    #             check_due_tasks()
+        def scheduled_job():
+            with app.app_context():
+                check_due_tasks()
 
-    #     scheduler.add_job(
-    #         func=scheduled_job,
-    #         trigger="interval",
-    #         minutes=1
-    #     )
+        def backup_job():
+            with app.app_context():
+                backup_tasks_to_csv()
 
-    #     scheduler.start()
+        # check tasks every minute
+        scheduler.add_job(
+            func=scheduled_job,
+            trigger="interval",
+            minutes=1
+        )
+
+        # backup once per day
+        scheduler.add_job(
+            func=backup_job,
+            trigger="interval",
+            hours=24
+        )
+
+        scheduler.start()
         
     return app
 

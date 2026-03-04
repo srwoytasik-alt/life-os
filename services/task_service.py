@@ -142,3 +142,9 @@ class TaskService:
 
         return tasks
     
+    
+    def get_todays_mission(self):
+        ranked = self.get_ranked_tasks()
+        return [t for t, score in ranked if not t.completed][:3]
+    
+    
