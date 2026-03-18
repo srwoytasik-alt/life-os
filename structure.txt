@@ -12,4 +12,46 @@ todo_app/
 └── data/
     └── tasks.json
 
-    
+
+
+
+todo_app/
+│
+├── app.py
+├── database.py (coming later)
+├── models/
+│   ├── __init__.py
+│   └── task.py
+├── services/
+│   ├── __init__.py
+│   └── task_service.py
+├── repositories/
+│   ├── __init__.py
+│   └── task_repository.py
+├── tests/
+│   ├── __init__.py
+│   ├── test_task_model.py
+│   ├── test_repository.py
+│   └── test_service.py
+└── data/tasks.json
+
+
+todo_app/
+│
+├── app.py
+├── config.py
+├── database.py
+├── migrations/        (auto-generated)
+├── models/
+│   ├── __init__.py
+│   ├── task.py         (business logic)
+│   └── task_model.py   (ORM model)
+├── repositories/
+│   ├── __init__.py
+│   └── sql_repository.py
+├── services/
+│   ├── __init__.py
+│   └── task_service.py
+├── tests/
+├── .env
+└── requirements.txt

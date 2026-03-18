@@ -1,196 +1,112 @@
 # app.py
 
-from flask import Flask, render_template, request, redirect, jsonify
-from config import Config
-from database import db, migrate
-from repositories.sql_repository import SQLTaskRepository
-from services.task_service import TaskService
-from dotenv import load_dotenv
-from apscheduler.schedulers.background import BackgroundScheduler
-from services.reminder_service import check_due_tasks
-# from flask_mail import Mail, Message
 import os
-import models
-from services.finance_service import FinanceService
-from services.backup_service import backup_tasks_to_csv
+from flask import Flask, render_template, request, redirect, url_for, jsonify
+from database import db, migrate
+from config import Config
+from models.task_model import TaskModel
+from services.task_service import TaskService
+from repositories.sql_repository import SQLTaskRepository
+from services.reminder_service import check_due_tasks
+from datetime import datetime
 
-
-
-def create_app(test_config=None):
-    load_dotenv()
-
+def create_app(config_class=Config):
     app = Flask(__name__)
-
-    if test_config:
-        app.config.update(test_config)
-    else:
-        app.config.from_object(Config)
-
+    app.config.from_object(config_class)
+    
+    # Ensure instance folder exists
+    try:
+        os.makedirs(os.path.join(os.path.dirname(__file__), 'instance'), exist_ok=True)
+    except OSError:
+        pass
+    
+    # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     
-    # Register models with SQLAlchemy metadata
-    import models  # Ensure models are registered here
-
-    repo = SQLTaskRepository()
-    service = TaskService(repo)
-    finance_service = FinanceService()
-
+    # Create tables
     with app.app_context():
         db.create_all()
-    # # Configure Mail
-    # app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
-    # app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
-    # app.config['MAIL_USE_TLS'] = os.getenv("MAIL_USE_TLS")
-    # app.config['MAIL_USE_SSL'] = os.getenv("MAIL_USE_SSL")
-    # app.config['MAIL_PORT'] = os.getenv("MAIL_PORT")
-    # app.config['MAIL_SERVER'] = os.getenv("MAIL_SERVER")
-
-    # mail = Mail(app)
-
-    # # Send email reminder
-    # def send_email_reminder(subject, body, to):
-    #     msg = Message(subject, recipients=[to])
-    #     msg.body = body
-    #     mail.send(msg)
-
-    # ---------------------
-    # Web Routes
-    # ---------------------
-
-    @app.route("/")
+    
+    # Initialize repository and service
+    repo = SQLTaskRepository()
+    task_service = TaskService(repo)
+    
+    @app.route('/')
     def index():
-        operator = request.args.get("operator")
-
-        if operator == "true":
-            scored_tasks = service.get_top_critical()
-        else:
-            scored_tasks = service.get_ranked_tasks()
-
-        # extract task list for stats
-        tasks_only = [task for task, score in scored_tasks]
-
-        total = len(tasks_only)
-        completed = len([t for t in tasks_only if t.completed])
-
-        completion_percent = round((completed / total) * 100, 2) if total else 0
-
-        high_critical = len([t for t in tasks_only if t.priority in ["High", "Critical"]])
-        urgency_percent = round((high_critical / total) * 100, 2) if total else 0
-
-        suggestions = service.get_suggestions()
-        stability_index = service.get_stability_index()
-
-        mission = service.get_todays_mission()
-
-        return render_template(
-            "index.html",
-            scored_tasks=scored_tasks,
-            suggested_tasks=suggestions,
-            mission=mission,
-            completion_percent=completion_percent,
-            urgency_percent=urgency_percent,
-            stability_index=stability_index
-        )
-
-    @app.route("/add", methods=["POST"])
-    def add():
-        service.add_task(
-            request.form.get("title"),
-            request.form.get("priority"),
-            request.form.get("due_date"),
-            request.form.get("domain")
-        )
-        return redirect("/")
-
-    @app.route("/toggle/<int:task_id>")
-    def toggle(task_id):
-        service.toggle(task_id)
-        return redirect("/")
-
-    @app.route("/delete/<int:task_id>")
-    def delete(task_id):
-        service.delete(task_id)
-        return redirect("/")
-
-    # ---------------------
-    # API Routes
-    # ---------------------
-
-    @app.route("/api/tasks", methods=["GET"])
-    def api_get_tasks():
-        tasks = service.get_all()
-        return jsonify([t.to_dict() for t in tasks])
-
-    @app.route("/api/tasks", methods=["POST"])
-    def api_create_task():
-        data = request.json
-
-        service.add_task(
-            data.get("title"),
-            data.get("priority"),
-            data.get("due_date"),
-            data.get("domain")
-        )
-
-        return jsonify({"message": "Task created"}), 201
-
-    @app.route("/import-finance", methods=["POST"])
-    def import_finance():
-        file = request.files["file"]
-        filepath = "uploaded_finance.csv"
-        file.save(filepath)
-
-        finance_service.import_csv(filepath)
-
-        return redirect("/")
-
-    @app.route("/api/tasks/<int:task_id>", methods=["PUT"])
-    def api_update_task(task_id):
-        service.toggle(task_id)
-        return jsonify({"message": "Task updated"})
-
-    @app.route("/api/tasks/<int:task_id>", methods=["DELETE"])
-    def api_delete_task(task_id):
-        service.delete(task_id)
-        return jsonify({"message": "Task deleted"})
-
-    # ---------------------
-    # Background Scheduler
-    # ---------------------
-
-    if not app.config.get("TESTING"):
-        scheduler = BackgroundScheduler()
-
-        def scheduled_job():
-            with app.app_context():
-                check_due_tasks()
-
-        def backup_job():
-            with app.app_context():
-                backup_tasks_to_csv()
-
-        # check tasks every minute
-        scheduler.add_job(
-            func=scheduled_job,
-            trigger="interval",
-            minutes=1
-        )
-
-        # backup once per day
-        scheduler.add_job(
-            func=backup_job,
-            trigger="interval",
-            hours=24
-        )
-
-        scheduler.start()
+        filter_type = request.args.get('filter', 'all')
+        tasks = task_service.get_filtered_tasks(filter_type)
         
+        # Get suggestions for today
+        suggestions = task_service.get_suggestions()
+        
+        # Calculate stats
+        total_tasks = len(task_service.get_all())
+        completed_tasks = len([t for t in task_service.get_all() if t.completed])
+        completion_percentage = round((completed_tasks / total_tasks * 100), 2) if total_tasks > 0 else 0
+        
+        # Calculate urgency percentage (Critical + High incomplete)
+        critical_high = len([t for t in task_service.get_all() 
+                            if not t.completed and t.priority in ['Critical', 'High']])
+        urgency_percentage = round((critical_high / total_tasks * 100), 2) if total_tasks > 0 else 0
+        
+        # Stability index
+        stability = task_service.get_stability_index()
+        
+        # Today's mission
+        todays_mission = task_service.get_todays_mission()
+        
+        return render_template('index.html', 
+                             tasks=tasks,
+                             suggestions=suggestions,
+                             completion_percentage=completion_percentage,
+                             urgency_percentage=urgency_percentage,
+                             stability=stability,
+                             todays_mission=todays_mission,
+                             current_filter=filter_type)
+    
+    @app.route('/add', methods=['POST'])
+    def add_task():
+        title = request.form.get('title')
+        priority = request.form.get('priority', 'Medium')
+        due_date = request.form.get('due_date')
+        domain = request.form.get('domain', 'General')
+        
+        if title:
+            task_service.add_task(title, priority, due_date, domain)
+        
+        return redirect(url_for('index'))
+    
+    @app.route('/toggle/<int:task_id>')
+    def toggle_task(task_id):
+        task_service.toggle(task_id)
+        return redirect(url_for('index'))
+    
+    @app.route('/delete/<int:task_id>')
+    def delete_task(task_id):
+        task_service.delete(task_id)
+        return redirect(url_for('index'))
+    
+    @app.route('/check-reminders')
+    def check_reminders():
+        with app.app_context():
+            check_due_tasks()
+        return redirect(url_for('index'))
+    
+    @app.route('/api/tasks')
+    def api_tasks():
+        tasks = task_service.get_all()
+        return jsonify([{
+            'id': t.id,
+            'title': t.title,
+            'priority': t.priority,
+            'due_date': t.due_date.strftime('%Y-%m-%d') if t.due_date else None,
+            'domain': t.domain,
+            'completed': t.completed
+        } for t in tasks])
+    
     return app
 
-
-app = create_app()
-
-if __name__ == "__main__":
+if __name__ == '__main__':
+    app = create_app()
     app.run(debug=True)
-    

@@ -1,0 +1,45 @@
+LifeOS directory structure
+todo_app/
+    app.py
+    config.py
+    database.py
+    export_data.py
+    finance_sample.csv
+    requirements.txt
+    struture.txt
+    wsgi.py
+    
+    instance/
+        lifeos.db 
+        tasks.db 
+    migrations/
+    models/
+        financial_model.py
+        task_model.py
+        task.py
+    repositories/
+        sql_repository.py
+        task_repository.py
+    services/
+        backup_service.py
+        fianace_service.py
+        reminder_service.py
+        task_manager.py
+        task_service.py
+    static/
+        styles.css
+    storage/
+        task_repository.py
+    templates/
+        index.html
+        optional.css
+        overdue.css
+        styles.css
+    tests/
+        conftest.py
+        test_database.py
+        test_repository.py
+        test_service.py
+        test_task_model.py
+
+
