@@ -9,8 +9,8 @@ from services.task_service import TaskService
 from repositories.sql_repository import SQLTaskRepository
 from services.reminder_service import check_due_tasks
 from services.backup_service import backup_tasks_to_csv, get_last_backup_time
-from datetime import datetime
-from sqlalchemy import create_engine
+from datetime import datetime, date, timedelta
+from sqlalchemy import create_engine, text
 from sqlalchemy.pool import NullPool
 
 
@@ -94,13 +94,19 @@ def create_app(config_class=Config):
     @app.route('/')
     def index():
         filter_type = request.args.get('filter', 'all')
-        tasks = task_service.get_filtered_tasks(filter_type)
+        show_archived = request.args.get('archived', 'false') == 'true'
+        
+        # Get tasks with archive filter
+        if show_archived:
+            tasks = task_service.get_archived_tasks()
+        else:
+            tasks = task_service.get_filtered_tasks(filter_type)
         
         # Get suggestions for today
         suggestions = task_service.get_suggestions()
         
         # Calculate stats
-        all_tasks = task_service.get_all()
+        all_tasks = task_service.get_all(include_archived=False)
         total_tasks = len(all_tasks)
         completed_tasks = len([t for t in all_tasks if t.completed])
         completion_percentage = round((completed_tasks / total_tasks * 100), 2) if total_tasks > 0 else 0
@@ -119,6 +125,11 @@ def create_app(config_class=Config):
         # Get last backup time
         last_backup = get_last_backup_time()
         
+        # Get task counts for sections
+        today_count = len(task_service.get_tasks_due_today())
+        overdue_count = len(task_service.get_overdue_tasks())
+        upcoming_count = len(task_service.get_upcoming_tasks(days=7))
+        
         return render_template('index.html', 
                              tasks=tasks,
                              suggestions=suggestions,
@@ -127,8 +138,12 @@ def create_app(config_class=Config):
                              stability=stability,
                              todays_mission=todays_mission,
                              current_filter=filter_type,
+                             show_archived=show_archived,
                              last_backup=last_backup,
-                             task_service=task_service)  # Pass task_service to template for score calculation
+                             today_count=today_count,
+                             overdue_count=overdue_count,
+                             upcoming_count=upcoming_count,
+                             task_service=task_service)
     
     @app.route('/add', methods=['POST'])
     def add_task():
@@ -136,7 +151,7 @@ def create_app(config_class=Config):
         priority = request.form.get('priority', 'Medium')
         due_date = request.form.get('due_date')
         domain = request.form.get('domain', 'General')
-        repeat = request.form.get('repeat') or None  # Get repeat value, default to None if empty
+        repeat = request.form.get('repeat') or None
         
         if title:
             try:
@@ -159,8 +174,26 @@ def create_app(config_class=Config):
     @app.route('/delete/<int:task_id>')
     def delete_task(task_id):
         try:
-            task_service.delete(task_id)
-            print(f"✅ Task {task_id} deleted")
+            task_service.soft_delete(task_id)  # Now uses soft delete
+            print(f"✅ Task {task_id} archived")
+        except Exception as e:
+            print(f"❌ Error archiving task: {e}")
+        return redirect(url_for('index'))
+    
+    @app.route('/restore/<int:task_id>')
+    def restore_task(task_id):
+        try:
+            task_service.restore(task_id)
+            print(f"✅ Task {task_id} restored")
+        except Exception as e:
+            print(f"❌ Error restoring task: {e}")
+        return redirect(url_for('index'))
+    
+    @app.route('/permanent-delete/<int:task_id>')
+    def permanent_delete(task_id):
+        try:
+            task_service.permanent_delete(task_id)
+            print(f"✅ Task {task_id} permanently deleted")
         except Exception as e:
             print(f"❌ Error deleting task: {e}")
         return redirect(url_for('index'))
@@ -177,7 +210,7 @@ def create_app(config_class=Config):
     
     @app.route('/api/tasks')
     def api_tasks():
-        tasks = task_service.get_all()
+        tasks = task_service.get_all(include_archived=False)
         return jsonify([{
             'id': t.id,
             'title': t.title,
@@ -185,20 +218,17 @@ def create_app(config_class=Config):
             'due_date': t.due_date.strftime('%Y-%m-%d') if t.due_date else None,
             'domain': t.domain,
             'completed': t.completed,
-            'repeat': t.repeat
+            'repeat': t.repeat,
+            'next_occurrence': task_service.get_next_occurrence(t) if t.repeat and not t.completed else None
         } for t in tasks])
     
     @app.route('/backup')
     def backup_tasks():
         """Generate and download a CSV backup of all tasks"""
         try:
-            # Generate the backup file
             filename = backup_tasks_to_csv()
-            
-            # Create a clean filename with date for download
             download_filename = f"tasks_backup_{datetime.now().strftime('%Y-%m-%d')}.csv"
             
-            # Send it directly to the browser for download
             return send_file(
                 filename, 
                 as_attachment=True, 
@@ -210,11 +240,11 @@ def create_app(config_class=Config):
     
     @app.route('/health')
     def health_check():
-        """Health check endpoint for Render"""
+        """Health check endpoint for Render - FIXED with text()"""
         try:
-            # Test database connection
             with app.app_context():
-                db.session.execute('SELECT 1').scalar()
+                # FIXED: Use text() for raw SQL in SQLAlchemy 2.0
+                db.session.execute(text('SELECT 1')).scalar()
             return jsonify({"status": "healthy", "database": "connected"}), 200
         except Exception as e:
             return jsonify({"status": "unhealthy", "error": str(e)}), 500
