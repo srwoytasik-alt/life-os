@@ -1,15 +1,8 @@
-Flask
-Flask-SQLAlchemy
-Flask-Migrate
-python-dotenv
-gunicorn
-psycopg2-binary
-APScheduler
-
 Flask==2.3.3
 Flask-SQLAlchemy==3.1.1
 Flask-Migrate==4.0.5
 python-dotenv==1.0.0
 gunicorn==21.2.0
 psycopg2-binary==2.9.9
-APScheduler==3.10.4python-dateutil==2.8.2
+APScheduler==3.10.4
+python-dateutil==2.8.2
