@@ -9,16 +9,70 @@ from services.task_service import TaskService
 from repositories.sql_repository import SQLTaskRepository
 from services.reminder_service import check_due_tasks
 from datetime import datetime
+from sqlalchemy import create_engine
+from sqlalchemy.pool import NullPool
+
 
 def create_app(config_class=Config):
     app = Flask(__name__)
+    
+    # DEBUG: Print environment variables before loading config
+    print("=" * 60)
+    print("🔍 DEBUG - Environment Variables at Startup:")
+    print("=" * 60)
+    for key in os.environ:
+        if 'DATABASE' in key or 'SUPABASE' in key:
+            value = os.environ[key]
+            if 'postgresql://' in value or 'postgres://' in value:
+                # Mask the password for safety but show structure
+                masked = value.split('@')
+                if len(masked) > 1:
+                    print(f"  {key}: {masked[0][:20]}...@{masked[1]}")
+                else:
+                    print(f"  {key}: [URL FORMAT]")
+            else:
+                print(f"  {key}: {value}")
+    print("=" * 60)
+    
     app.config.from_object(config_class)
     
-    # Ensure instance folder exists
+    # DEBUG: Check what ended up in the config
+    print(f"🔍 Config - SQLALCHEMY_DATABASE_URI after loading: {app.config.get('SQLALCHEMY_DATABASE_URI', 'NOT SET')}")
+    
+    # Ensure instance folder exists (for SQLite fallback)
     try:
         os.makedirs(os.path.join(os.path.dirname(__file__), 'instance'), exist_ok=True)
     except OSError:
         pass
+    
+    # Check if we're using Supabase (PostgreSQL) or SQLite
+    database_url = app.config.get('SQLALCHEMY_DATABASE_URI')
+    
+    if not database_url:
+        print("❌ CRITICAL ERROR: SQLALCHEMY_DATABASE_URI is not set!")
+        print("   Make sure SUPABASE_DATABASE_URL or DATABASE_URL is set in environment")
+    else:
+        using_supabase = 'supabase' in database_url.lower() or 'pooler.supabase' in database_url.lower()
+        
+        # Configure engine options based on database type
+        if using_supabase:
+            # For Supabase pooled connections, use NullPool
+            app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+                'poolclass': NullPool,  # Let Supabase handle connection pooling
+                'pool_pre_ping': True,
+                'connect_args': {
+                    'sslmode': 'require',
+                    'connect_timeout': 10
+                }
+            }
+            print("✅ Using Supabase PostgreSQL database")
+        else:
+            # For SQLite, use standard settings
+            app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+                'pool_pre_ping': True,
+                'pool_recycle': 280
+            }
+            print("✅ Using SQLite database")
     
     # Initialize extensions
     db.init_app(app)
@@ -26,7 +80,11 @@ def create_app(config_class=Config):
     
     # Create tables
     with app.app_context():
-        db.create_all()
+        try:
+            db.create_all()
+            print("✅ Database tables created/verified")
+        except Exception as e:
+            print(f"❌ Error creating tables: {e}")
     
     # Initialize repository and service
     repo = SQLTaskRepository()
@@ -41,12 +99,13 @@ def create_app(config_class=Config):
         suggestions = task_service.get_suggestions()
         
         # Calculate stats
-        total_tasks = len(task_service.get_all())
-        completed_tasks = len([t for t in task_service.get_all() if t.completed])
+        all_tasks = task_service.get_all()
+        total_tasks = len(all_tasks)
+        completed_tasks = len([t for t in all_tasks if t.completed])
         completion_percentage = round((completed_tasks / total_tasks * 100), 2) if total_tasks > 0 else 0
         
         # Calculate urgency percentage (Critical + High incomplete)
-        critical_high = len([t for t in task_service.get_all() 
+        critical_high = len([t for t in all_tasks 
                             if not t.completed and t.priority in ['Critical', 'High']])
         urgency_percentage = round((critical_high / total_tasks * 100), 2) if total_tasks > 0 else 0
         
@@ -73,24 +132,40 @@ def create_app(config_class=Config):
         domain = request.form.get('domain', 'General')
         
         if title:
-            task_service.add_task(title, priority, due_date, domain)
+            try:
+                task_service.add_task(title, priority, due_date, domain)
+                print(f"✅ Task added: {title}")
+            except Exception as e:
+                print(f"❌ Error adding task: {e}")
         
         return redirect(url_for('index'))
     
     @app.route('/toggle/<int:task_id>')
     def toggle_task(task_id):
-        task_service.toggle(task_id)
+        try:
+            task_service.toggle(task_id)
+            print(f"✅ Task {task_id} toggled")
+        except Exception as e:
+            print(f"❌ Error toggling task: {e}")
         return redirect(url_for('index'))
     
     @app.route('/delete/<int:task_id>')
     def delete_task(task_id):
-        task_service.delete(task_id)
+        try:
+            task_service.delete(task_id)
+            print(f"✅ Task {task_id} deleted")
+        except Exception as e:
+            print(f"❌ Error deleting task: {e}")
         return redirect(url_for('index'))
     
     @app.route('/check-reminders')
     def check_reminders():
         with app.app_context():
-            check_due_tasks()
+            try:
+                check_due_tasks()
+                print("✅ Reminders checked")
+            except Exception as e:
+                print(f"❌ Error checking reminders: {e}")
         return redirect(url_for('index'))
     
     @app.route('/api/tasks')
@@ -105,8 +180,21 @@ def create_app(config_class=Config):
             'completed': t.completed
         } for t in tasks])
     
+    @app.route('/health')
+    def health_check():
+        """Health check endpoint for Render"""
+        try:
+            # Test database connection
+            with app.app_context():
+                db.session.execute('SELECT 1').scalar()
+            return jsonify({"status": "healthy", "database": "connected"}), 200
+        except Exception as e:
+            return jsonify({"status": "unhealthy", "error": str(e)}), 500
+    
     return app
 
+# Create the application instance for Gunicorn
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
     app.run(debug=True)

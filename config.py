@@ -1,20 +1,26 @@
+# config.py
+
 import os
 
 class Config:
-    # Use environment variable or default to SQLite
-    basedir = os.path.abspath(os.path.dirname(__file__))
+    # Try multiple environment variable names
+    database_url = (
+        os.environ.get('SUPABASE_DATABASE_URL') or 
+        os.environ.get('DATABASE_URL') or 
+        None
+    )
     
-    # SQLite configuration
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'instance', 'lifeos.db'))
+    # Handle Render's postgres:// vs postgresql:// difference
+    if database_url and database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
     
-    # If DATABASE_URL starts with postgres://, convert to postgresql:// (for Render compatibility)
-    if SQLALCHEMY_DATABASE_URI and SQLALCHEMY_DATABASE_URI.startswith('postgres://'):
-        SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace('postgres://', 'postgresql://', 1)
+    # THIS MUST BE SET - no fallback to SQLite for production
+    SQLALCHEMY_DATABASE_URI = database_url
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    # SQLite specific optimizations
+    # Base engine options (will be overridden in app.py based on database type)
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,
-        "pool_recycle": 280
+        "pool_recycle": 300,
     }
