@@ -91,6 +91,60 @@ def create_app(config_class=Config):
     repo = SQLTaskRepository()
     task_service = TaskService(repo)
     
+    # @app.route('/')
+    # def index():
+    #     filter_type = request.args.get('filter', 'all')
+    #     show_archived = request.args.get('archived', 'false') == 'true'
+        
+    #     # Get tasks with archive filter
+    #     if show_archived:
+    #         tasks = task_service.get_archived_tasks()
+    #     else:
+    #         tasks = task_service.get_filtered_tasks(filter_type)
+        
+    #     # Get suggestions for today
+    #     suggestions = task_service.get_suggestions()
+        
+    #     # Calculate stats
+    #     all_tasks = task_service.get_all(include_archived=False)
+    #     total_tasks = len(all_tasks)
+    #     completed_tasks = len([t for t in all_tasks if t.completed])
+    #     completion_percentage = round((completed_tasks / total_tasks * 100), 2) if total_tasks > 0 else 0
+        
+    #     # Calculate urgency percentage (Critical + High incomplete)
+    #     critical_high = len([t for t in all_tasks 
+    #                         if not t.completed and t.priority in ['Critical', 'High']])
+    #     urgency_percentage = round((critical_high / total_tasks * 100), 2) if total_tasks > 0 else 0
+        
+    #     # Stability index
+    #     stability = task_service.get_stability_index()
+        
+    #     # Today's mission
+    #     todays_mission = task_service.get_todays_mission()
+        
+    #     # Get last backup time
+    #     last_backup = get_last_backup_time()
+        
+    #     # Get task counts for sections
+    #     today_count = len(task_service.get_tasks_due_today())
+    #     overdue_count = len(task_service.get_overdue_tasks())
+    #     upcoming_count = len(task_service.get_upcoming_tasks(days=7))
+        
+    #     return render_template('index.html', 
+    #                          tasks=tasks,
+    #                          suggestions=suggestions,
+    #                          completion_percentage=completion_percentage,
+    #                          urgency_percentage=urgency_percentage,
+    #                          stability=stability,
+    #                          todays_mission=todays_mission,
+    #                          current_filter=filter_type,
+    #                          show_archived=show_archived,
+    #                          last_backup=last_backup,
+    #                          today_count=today_count,
+    #                          overdue_count=overdue_count,
+    #                          upcoming_count=upcoming_count,
+    #                          task_service=task_service)
+    
     @app.route('/')
     def index():
         filter_type = request.args.get('filter', 'all')
@@ -110,10 +164,7 @@ def create_app(config_class=Config):
         total_tasks = len(all_tasks)
         completed_tasks = len([t for t in all_tasks if t.completed])
         completion_percentage = round((completed_tasks / total_tasks * 100), 2) if total_tasks > 0 else 0
-        
-        # Calculate urgency percentage (Critical + High incomplete)
-        critical_high = len([t for t in all_tasks 
-                            if not t.completed and t.priority in ['Critical', 'High']])
+        critical_high = len([t for t in all_tasks if not t.completed and t.priority in ['Critical', 'High']])
         urgency_percentage = round((critical_high / total_tasks * 100), 2) if total_tasks > 0 else 0
         
         # Stability index
@@ -123,27 +174,25 @@ def create_app(config_class=Config):
         todays_mission = task_service.get_todays_mission()
         
         # Get last backup time
+        from services.backup_service import get_last_backup_time
         last_backup = get_last_backup_time()
-        
-        # Get task counts for sections
-        today_count = len(task_service.get_tasks_due_today())
-        overdue_count = len(task_service.get_overdue_tasks())
-        upcoming_count = len(task_service.get_upcoming_tasks(days=7))
+        last_backup_formatted = last_backup.strftime('%B %d, %I:%M %p') if last_backup else None
         
         return render_template('index.html', 
-                             tasks=tasks,
-                             suggestions=suggestions,
-                             completion_percentage=completion_percentage,
-                             urgency_percentage=urgency_percentage,
-                             stability=stability,
-                             todays_mission=todays_mission,
-                             current_filter=filter_type,
-                             show_archived=show_archived,
-                             last_backup=last_backup,
-                             today_count=today_count,
-                             overdue_count=overdue_count,
-                             upcoming_count=upcoming_count,
-                             task_service=task_service)
+                            tasks=tasks,
+                            suggestions=suggestions,
+                            completion_percentage=completion_percentage,
+                            urgency_percentage=urgency_percentage,
+                            stability=stability,
+                            todays_mission=todays_mission,
+                            current_filter=filter_type,
+                            show_archived=show_archived,
+                            last_backup_time=last_backup_formatted,
+                            completed_tasks=completed_tasks,
+                            total_tasks=total_tasks,
+                            critical_high=critical_high,
+                            task_service=task_service)
+        
     
     @app.route('/add', methods=['POST'])
     def add_task():

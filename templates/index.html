@@ -26,8 +26,8 @@
         .header {
             background: white;
             border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         }
         
@@ -36,25 +36,24 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 15px;
         }
         
         .header h1 {
             color: #333;
-            font-size: 2.5em;
+            font-size: 2em;
             margin: 0;
         }
         
         .last-backup {
             background: #f8f9fa;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 30px;
-            font-size: 1em;
+            font-size: 0.9em;
             border: 1px solid #e0e0e0;
             display: flex;
             align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            gap: 15px;
         }
         
         .backup-label {
@@ -66,34 +65,60 @@
             color: #28a745;
             font-weight: bold;
             background: #e8f5e9;
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 20px;
+        }
+        
+        .backup-btn {
+            background: #28a745;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        
+        .backup-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
         }
         
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         
         .card {
             background: white;
             border-radius: 15px;
-            padding: 25px;
+            padding: 20px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
         
         .card h3 {
             color: #666;
-            font-size: 1.1em;
-            margin-bottom: 15px;
+            font-size: 1em;
+            margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         
+        .mission-list {
+            list-style: none;
+        }
+        
+        .mission-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
         .percentage {
-            font-size: 3em;
+            font-size: 2.5em;
             font-weight: bold;
             color: #764ba2;
         }
@@ -105,7 +130,7 @@
         }
         
         .stability-index {
-            font-size: 3em;
+            font-size: 2.5em;
             font-weight: bold;
             color: #ff6b6b;
         }
@@ -124,19 +149,20 @@
         .add-task {
             background: white;
             border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
+            padding: 25px;
+            margin-bottom: 25px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
         
         .add-task h2 {
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
         }
         
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
             margin-bottom: 15px;
         }
@@ -150,6 +176,7 @@
             margin-bottom: 5px;
             color: #666;
             font-weight: 500;
+            font-size: 0.9em;
         }
         
         .form-group input,
@@ -157,7 +184,7 @@
             padding: 10px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
-            font-size: 1em;
+            font-size: 0.95em;
             transition: border-color 0.3s;
         }
         
@@ -184,27 +211,49 @@
             box-shadow: 0 5px 20px rgba(118, 75, 162, 0.4);
         }
         
-        .btn-secondary {
-            background: #667eea;
+        .filter-tabs {
+            background: white;
+            border-radius: 10px 10px 0 0;
+            padding: 15px 20px 0;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #764ba2;
         }
         
-        .btn-backup {
-            background: #28a745;
-            margin-bottom: 20px;
+        .filter-tabs a {
+            padding: 10px 18px;
+            background: #f0f0f0;
+            color: #666;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            margin-right: 5px;
+        }
+        
+        .filter-tabs a.active {
+            background: #764ba2;
+            color: white;
+        }
+        
+        .filter-tabs a:hover:not(.active) {
+            background: #e0e0e0;
         }
         
         .filter-bar {
             background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 15px 20px;
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            border-bottom: 1px solid #e0e0e0;
         }
         
         .filter-btn {
-            padding: 8px 16px;
+            padding: 6px 12px;
             background: #f0f0f0;
             color: #666;
             border: none;
@@ -220,14 +269,13 @@
             color: white;
         }
         
-        .filter-btn:hover {
-            background: #667eea;
-            color: white;
+        .filter-btn:hover:not(.active) {
+            background: #e0e0e0;
         }
         
         .task-table {
             background: white;
-            border-radius: 15px;
+            border-radius: 0 0 15px 15px;
             padding: 20px;
             overflow-x: auto;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
@@ -250,6 +298,7 @@
         td {
             padding: 12px 10px;
             border-bottom: 1px solid #e0e0e0;
+            vertical-align: middle;
         }
         
         .priority-Critical {
@@ -285,6 +334,22 @@
             color: #ff6b6b;
         }
         
+        .repeat-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #e7f3ff;
+            color: #0066cc;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+        
+        .next-occurrence {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 3px;
+        }
+        
         .action-btn {
             padding: 5px 10px;
             margin: 0 3px;
@@ -292,8 +357,9 @@
             border-radius: 3px;
             cursor: pointer;
             text-decoration: none;
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: white;
+            display: inline-block;
         }
         
         .action-btn.toggle {
@@ -304,15 +370,21 @@
             background: #dc3545;
         }
         
+        .action-btn.restore {
+            background: #ffc107;
+            color: #333;
+        }
+        
         .action-btn:hover {
             opacity: 0.8;
+            transform: translateY(-1px);
         }
         
         .recommendations {
             background: white;
             border-radius: 15px;
             padding: 20px;
-            margin-top: 30px;
+            margin-top: 25px;
         }
         
         .recommendations h3 {
@@ -332,68 +404,37 @@
             border-left: 4px solid #764ba2;
         }
         
-        .repeat-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            background: #e7f3ff;
-            color: #0066cc;
-            border-radius: 12px;
-            font-size: 0.85em;
-            font-weight: 500;
-        }
-        
-        .backup-section {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-        
-        .backup-wrapper {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .backup-info {
-            background: white;
-            padding: 12px 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        .archived-badge {
+            background: #6c757d;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            margin-left: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header with Last Backup Indicator -->
+        <!-- Header with Last Backup -->
         <div class="header">
             <div class="header-content">
                 <h1>Steve Task Control System</h1>
                 <div class="last-backup">
                     <span class="backup-label">📦 Last backup:</span>
-                    <span class="backup-time">{{ last_backup }}</span>
+                    <span class="backup-time">{{ last_backup_time if last_backup_time else 'Never' }}</span>
+                    <a href="{{ url_for('backup_tasks') }}" class="backup-btn">💾 Export CSV Backup</a>
                 </div>
             </div>
-        </div>
-        
-        <!-- Backup Section with Info -->
-        <div class="backup-wrapper">
-            <div class="backup-info">
-                <span>💾 Click the button to download a CSV backup of all your tasks</span>
-            </div>
-            <a href="{{ url_for('backup_tasks') }}" class="btn btn-backup">
-                💾 Backup Tasks to CSV
-            </a>
         </div>
         
         <!-- Dashboard Cards -->
         <div class="dashboard-grid">
             <div class="card">
-                <h3>Today's Mission</h3>
-                <ul style="list-style: none;">
+                <h3>🎯 Today's Mission</h3>
+                <ul class="mission-list">
                     {% for task in todays_mission %}
-                        <li style="padding: 5px 0;">• {{ task.title }}</li>
+                        <li>{{ task.title }} — Due: {{ task.due_date.strftime('%Y-%m-%d') if task.due_date else 'No date' }}</li>
                     {% else %}
                         <li style="color: #999;">No tasks for today</li>
                     {% endfor %}
@@ -401,17 +442,19 @@
             </div>
             
             <div class="card">
-                <h3>Completion</h3>
+                <h3>📊 Completion</h3>
                 <div class="percentage">{{ completion_percentage }}%</div>
+                <div style="color: #666; font-size: 0.9em;">{{ completed_tasks }}/{{ total_tasks }} tasks</div>
             </div>
             
             <div class="card">
-                <h3>Urgency (High/Critical)</h3>
+                <h3>⚠️ Urgency (High/Critical)</h3>
                 <div class="percentage">{{ urgency_percentage }}%</div>
+                <div style="color: #666; font-size: 0.9em;">{{ critical_high }} urgent tasks</div>
             </div>
             
             <div class="card">
-                <h3>System Stability</h3>
+                <h3>⚡ System Stability</h3>
                 <div class="stability">
                     <div class="stability-index">{{ stability }}</div>
                     <div class="stability-label {% if stability < 50 %}high{% endif %}">
@@ -463,7 +506,7 @@
                     <div class="form-group">
                         <label for="repeat">Repeat</label>
                         <select id="repeat" name="repeat">
-                            <option value="">Never</option>
+                            <option value="">None</option>
                             <option value="daily">Daily</option>
                             <option value="weekly">Weekly</option>
                             <option value="monthly">Monthly</option>
@@ -476,17 +519,24 @@
             </form>
         </div>
         
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <a href="?filter=all" class="{% if current_filter == 'all' %}active{% endif %}">All</a>
+            <a href="?filter=today" class="{% if current_filter == 'today' %}active{% endif %}">Today</a>
+            <a href="?filter=overdue" class="{% if current_filter == 'overdue' %}active{% endif %}">Overdue</a>
+            <a href="?filter=upcoming" class="{% if current_filter == 'upcoming' %}active{% endif %}">Upcoming</a>
+        </div>
+        
         <!-- Filter Bar -->
         <div class="filter-bar">
-            <a href="{{ url_for('index', filter='all') }}" class="filter-btn {% if current_filter == 'all' %}active{% endif %}">All</a>
-            <a href="{{ url_for('index', filter='active') }}" class="filter-btn {% if current_filter == 'active' %}active{% endif %}">Active</a>
-            <a href="{{ url_for('index', filter='completed') }}" class="filter-btn {% if current_filter == 'completed' %}active{% endif %}">Completed</a>
-            <a href="{{ url_for('index', filter='overdue') }}" class="filter-btn {% if current_filter == 'overdue' %}active{% endif %}">Overdue</a>
-            <a href="{{ url_for('index', filter='high') }}" class="filter-btn {% if current_filter == 'high' %}active{% endif %}">High/Critical</a>
-            <a href="{{ url_for('index', filter='recurring') }}" class="filter-btn {% if current_filter == 'recurring' %}active{% endif %}">Recurring</a>
-            <a href="{{ url_for('index', filter='domain:Finance') }}" class="filter-btn {% if current_filter == 'domain:Finance' %}active{% endif %}">Finance</a>
-            <a href="{{ url_for('index', filter='domain:Skill') }}" class="filter-btn {% if current_filter == 'domain:Skill' %}active{% endif %}">Skill</a>
-            <a href="{{ url_for('index', filter='domain:Career') }}" class="filter-btn {% if current_filter == 'domain:Career' %}active{% endif %}">Career</a>
+            <a href="?filter=active" class="filter-btn {% if current_filter == 'active' %}active{% endif %}">Active</a>
+            <a href="?filter=completed" class="filter-btn {% if current_filter == 'completed' %}active{% endif %}">Completed</a>
+            <a href="?filter=high" class="filter-btn {% if current_filter == 'high' %}active{% endif %}">High/Critical</a>
+            <a href="?filter=recurring" class="filter-btn {% if current_filter == 'recurring' %}active{% endif %}">Recurring</a>
+            <a href="?filter=domain:Finance" class="filter-btn {% if current_filter == 'domain:Finance' %}active{% endif %}">Finance</a>
+            <a href="?filter=domain:Skill" class="filter-btn {% if current_filter == 'domain:Skill' %}active{% endif %}">Skill</a>
+            <a href="?filter=domain:Career" class="filter-btn {% if current_filter == 'domain:Career' %}active{% endif %}">Career</a>
+            <a href="?archived=true" class="filter-btn {% if show_archived %}active{% endif %}">🗂️ Show Archived</a>
         </div>
         
         <!-- Task Table -->
@@ -507,7 +557,12 @@
                 <tbody>
                     {% for task in tasks %}
                     <tr>
-                        <td>{{ task.title }}</td>
+                        <td>
+                            {{ task.title }}
+                            {% if task.archived %}
+                                <span class="archived-badge">Archived</span>
+                            {% endif %}
+                        </td>
                         <td class="priority-{{ task.priority }}">{{ task.priority }}</td>
                         <td>{{ task.due_date.strftime('%Y-%m-%d') if task.due_date else 'No date' }}</td>
                         <td class="status-{{ 'complete' if task.completed else 'incomplete' }}">
@@ -517,6 +572,10 @@
                         <td>
                             {% if task.repeat %}
                                 <span class="repeat-badge">{{ task.repeat }}</span>
+                                {% set next_date = task_service.get_next_occurrence(task) %}
+                                {% if next_date %}
+                                    <div class="next-occurrence">Next: {{ next_date.strftime('%Y-%m-%d') }}</div>
+                                {% endif %}
                             {% else %}
                                 —
                             {% endif %}
@@ -531,13 +590,20 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{{ url_for('toggle_task', task_id=task.id) }}" class="action-btn toggle">Toggle</a>
-                            <a href="{{ url_for('delete_task', task_id=task.id) }}" class="action-btn delete" onclick="return confirm('Are you sure?')">Delete</a>
+                            {% if show_archived %}
+                                <a href="{{ url_for('restore_task', task_id=task.id) }}" class="action-btn restore">Restore</a>
+                                <a href="{{ url_for('permanent_delete', task_id=task.id) }}" class="action-btn delete" onclick="return confirm('Permanently delete this task? This cannot be undone.')">Perm Delete</a>
+                            {% else %}
+                                <a href="{{ url_for('toggle_task', task_id=task.id) }}" class="action-btn toggle">Toggle</a>
+                                <a href="{{ url_for('delete_task', task_id=task.id) }}" class="action-btn delete" onclick="return confirm('Archive this task? You can restore it later from the Archived view.')">Archive</a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="8" style="text-align: center; color: #999;">No tasks found</td>
+                        <td colspan="8" style="text-align: center; color: #999; padding: 30px;">
+                            No tasks found. Add one above!
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -551,7 +617,7 @@
                 {% for task in suggestions %}
                     <li>{{ task.title }} - Due: {{ task.due_date.strftime('%Y-%m-%d') if task.due_date else 'No date' }}</li>
                 {% else %}
-                    <li>No recommendations</li>
+                    <li>No recommendations - you're all caught up! 🎉</li>
                 {% endfor %}
             </ul>
         </div>

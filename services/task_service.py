@@ -24,35 +24,38 @@ class TaskService:
     def toggle(self, task_id):
         task = self.repo.get_by_id(task_id)
         if not task:
-            return
+            return None
         
-        # PROTECTION: Check for duplicate recurring tasks
-        if task.repeat and not task.completed:
-            next_due_date = self.calculate_next_due_date(task)
-            if next_due_date:
+        # Toggle completion status
+        task.completed = not task.completed
+        
+        # If completing a recurring task, create the next instance
+        if task.completed and task.repeat:
+            next_due = self.calculate_next_due_date(task)
+            if next_due:
                 # Check if next instance already exists (duplicate protection)
                 existing = TaskModel.query.filter_by(
                     title=task.title,
-                    due_date=next_due_date,
+                    due_date=next_due,
                     repeat=task.repeat,
                     archived=False
                 ).first()
                 
-                if existing:
-                    print(f"⚠️ Next recurring instance already exists for: {task.title} on {next_due_date}")
-                else:
-                    # Create next instance
-                    self.add_task(
+                if not existing:
+                    new_task = TaskModel(
                         title=task.title,
                         priority=task.priority,
-                        due_date=next_due_date.strftime('%Y-%m-%d'),
+                        due_date=next_due,
                         domain=task.domain,
-                        repeat=task.repeat
+                        repeat=task.repeat,
+                        completed=False,
+                        archived=False
                     )
-                    print(f"✅ Created next recurring task: {task.title} for {next_due_date}")
+                    db.session.add(new_task)
+                    print(f"✅ Created next recurring task: {task.title} for {next_due}")
         
-        # Toggle the current task
-        self.repo.toggle(task_id)
+        db.session.commit()
+        return task
 
     def soft_delete(self, task_id):
         """Archive a task instead of deleting it"""
@@ -92,9 +95,23 @@ class TaskService:
         elif task.repeat == 'weekly':
             return task.due_date + timedelta(weeks=1)
         elif task.repeat == 'monthly':
-            return task.due_date + relativedelta(months=1)
+            # Handle month-end dates correctly
+            try:
+                # Try same day next month
+                if task.due_date.month == 12:
+                    return task.due_date.replace(year=task.due_date.year + 1, month=1)
+                else:
+                    return task.due_date.replace(month=task.due_date.month + 1)
+            except ValueError:
+                # Handle dates like Jan 31 -> Feb 28 (or 29 in leap year)
+                # Get last day of next month
+                if task.due_date.month == 12:
+                    next_month = date(task.due_date.year + 1, 2, 1) - timedelta(days=1)
+                else:
+                    next_month = date(task.due_date.year, task.due_date.month + 2, 1) - timedelta(days=1)
+                return next_month
         elif task.repeat == 'yearly':
-            return task.due_date + relativedelta(years=1)
+            return task.due_date.replace(year=task.due_date.year + 1)
         else:
             return None
 
@@ -102,8 +119,7 @@ class TaskService:
         """Get the next occurrence date for display"""
         if not task.repeat or task.completed:
             return None
-        next_date = self.calculate_next_due_date(task)
-        return next_date.strftime('%b %d, %Y') if next_date else None
+        return self.calculate_next_due_date(task)
 
     # -------------------------
     # Task Categorization
@@ -173,7 +189,7 @@ class TaskService:
             elif task_due <= today + timedelta(days=3):
                 score += 2
 
-        # Recurring tasks get a small boost (they're important habits)
+        # Recurring tasks get a small boost
         if task.repeat:
             score += 1
 
@@ -204,15 +220,6 @@ class TaskService:
             score = 0
         return score
 
-    def get_top_critical(self):
-        tasks = [
-            t for t in self.get_all()
-            if t.priority == "Critical" and not t.completed
-        ]
-        scored = [(task, self.calculate_score(task)) for task in tasks]
-        scored.sort(key=lambda x: -x[1])
-        return scored[:5]
-
     def get_suggestions(self):
         ranked = self.get_ranked_tasks()
         return [task for task, score in ranked if not task.completed][:5]
@@ -222,27 +229,29 @@ class TaskService:
     # -------------------------
 
     def get_filtered_tasks(self, filter_type="all"):
-        tasks = self.get_all()
+        """Get tasks based on filter type"""
+        query = TaskModel.query.filter_by(archived=False)
         today = date.today()
 
-        if filter_type == "active":
-            return [t for t in tasks if not t.completed]
-        elif filter_type == "completed":
-            return [t for t in tasks if t.completed]
+        if filter_type == "today":
+            query = query.filter(TaskModel.due_date == today)
         elif filter_type == "overdue":
-            return self.get_overdue_tasks()
-        elif filter_type == "today":
-            return self.get_tasks_due_today()
+            query = query.filter(TaskModel.due_date < today, TaskModel.completed == False)
         elif filter_type == "upcoming":
-            return self.get_upcoming_tasks()
+            query = query.filter(TaskModel.due_date > today)
+        elif filter_type == "active":
+            query = query.filter_by(completed=False)
+        elif filter_type == "completed":
+            query = query.filter_by(completed=True)
         elif filter_type == "high":
-            return [t for t in tasks if t.priority in ["High", "Critical"]]
+            query = query.filter(TaskModel.priority.in_(["High", "Critical"]))
         elif filter_type.startswith("domain:"):
             domain_name = filter_type.split(":")[1]
-            return [t for t in tasks if t.domain == domain_name]
+            query = query.filter_by(domain=domain_name)
         elif filter_type == "recurring":
-            return [t for t in tasks if t.repeat is not None]
-        return tasks
+            query = query.filter(TaskModel.repeat.isnot(None))
+        
+        return query.order_by(TaskModel.due_date.asc(), TaskModel.priority.desc()).all()
     
     def get_todays_mission(self):
         ranked = self.get_ranked_tasks()

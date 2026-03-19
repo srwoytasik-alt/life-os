@@ -7,15 +7,17 @@ from datetime import datetime
 from models.task_model import TaskModel
 from database import db
 
+BACKUP_DIR = 'backups'
 
 def backup_tasks_to_csv():
+    """Create a CSV backup of all tasks"""
     tasks = TaskModel.query.all()
 
     # Create backups directory if it doesn't exist
-    os.makedirs('backups', exist_ok=True)
+    os.makedirs(BACKUP_DIR, exist_ok=True)
 
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    filename = f"backups/lifeos_backup_{timestamp}.csv"
+    filename = f"backups/tasks_backup_{timestamp}.csv"
 
     with open(filename, "w", newline="") as file:
         writer = csv.writer(file)
@@ -28,6 +30,7 @@ def backup_tasks_to_csv():
             "domain",
             "completed",
             "repeat",
+            "archived",
             "created_at"
         ])
 
@@ -40,32 +43,33 @@ def backup_tasks_to_csv():
                 t.domain,
                 t.completed,
                 t.repeat,
+                t.archived,
                 t.created_at
             ])
 
-    # Save last backup timestamp
-    save_last_backup_time()
-    
     print(f"✅ Backup created: {filename}")
     return filename
 
 
-def save_last_backup_time():
-    """Save the current time as the last backup timestamp"""
-    backup_info = {
-        'last_backup': datetime.now().isoformat(),
-        'last_backup_readable': datetime.now().strftime('%B %d, %I:%M %p')
-    }
-    
-    with open('backups/last_backup.json', 'w') as f:
-        json.dump(backup_info, f)
-
-
 def get_last_backup_time():
-    """Get the last backup timestamp if it exists"""
+    """Get the most recent backup timestamp from file system"""
+    if not os.path.exists(BACKUP_DIR):
+        return None
+    
+    # Look for backup files
+    files = [f for f in os.listdir(BACKUP_DIR) if f.startswith('tasks_backup_') and f.endswith('.csv')]
+    if not files:
+        return None
+    
+    # Get the most recent file by modification time
+    latest = max(files, key=lambda f: os.path.getmtime(os.path.join(BACKUP_DIR, f)))
+    file_path = os.path.join(BACKUP_DIR, latest)
+    
+    # Try to extract timestamp from filename (tasks_backup_20260318_143022.csv)
     try:
-        with open('backups/last_backup.json', 'r') as f:
-            data = json.load(f)
-            return data.get('last_backup_readable', 'Never')
-    except FileNotFoundError:
-        return 'Never'
+        # Format: tasks_backup_20260318_143022.csv
+        ts_str = latest.replace('tasks_backup_', '').replace('.csv', '')
+        return datetime.strptime(ts_str, '%Y%m%d_%H%M%S')
+    except:
+        # Fall back to file modification time
+        return datetime.fromtimestamp(os.path.getmtime(file_path))
