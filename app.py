@@ -191,11 +191,14 @@ def create_app(config_class=Config):
             # Generate the backup file
             filename = backup_tasks_to_csv()
             
+            # Create a clean filename with date for download
+            download_filename = f"tasks_backup_{datetime.now().strftime('%Y-%m-%d')}.csv"
+            
             # Send it directly to the browser for download
             return send_file(
                 filename, 
                 as_attachment=True, 
-                download_name=f'lifeos_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv',
+                download_name=download_filename,
                 mimetype='text/csv'
             )
         except Exception as e:
