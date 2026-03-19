@@ -123,7 +123,8 @@ def create_app(config_class=Config):
                              urgency_percentage=urgency_percentage,
                              stability=stability,
                              todays_mission=todays_mission,
-                             current_filter=filter_type)
+                             current_filter=filter_type,
+                             task_service=task_service)  # Pass task_service to template for score calculation
     
     @app.route('/add', methods=['POST'])
     def add_task():
@@ -187,13 +188,16 @@ def create_app(config_class=Config):
     def backup_tasks():
         """Generate and download a CSV backup of all tasks"""
         try:
+            # Generate the backup file
             filename = backup_tasks_to_csv()
-            # For download, you can either:
-            # Option 1: Return a download link
-            # return f"✅ Backup created: {filename}"
             
-            # Option 2: Actually serve the file for download
-            return send_file(filename, as_attachment=True, download_name='tasks_backup.csv')
+            # Send it directly to the browser for download
+            return send_file(
+                filename, 
+                as_attachment=True, 
+                download_name=f'lifeos_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv',
+                mimetype='text/csv'
+            )
         except Exception as e:
             return f"❌ Backup failed: {e}"
     
