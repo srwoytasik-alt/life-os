@@ -3,7 +3,7 @@ services:
     name: life-os
     runtime: python
     region: oregon
-    buildCommand: pip install -r requirements.txt
+    buildCommand: ./build.sh
     startCommand: gunicorn 'app:create_app()'
     envVars:
       - key: SUPABASE_DATABASE_URL
