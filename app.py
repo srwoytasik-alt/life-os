@@ -8,7 +8,7 @@ from models.task_model import TaskModel
 from services.task_service import TaskService
 from repositories.sql_repository import SQLTaskRepository
 from services.reminder_service import check_due_tasks
-from services.backup_service import backup_tasks_to_csv
+from services.backup_service import backup_tasks_to_csv, get_last_backup_time
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
@@ -116,6 +116,9 @@ def create_app(config_class=Config):
         # Today's mission
         todays_mission = task_service.get_todays_mission()
         
+        # Get last backup time
+        last_backup = get_last_backup_time()
+        
         return render_template('index.html', 
                              tasks=tasks,
                              suggestions=suggestions,
@@ -124,6 +127,7 @@ def create_app(config_class=Config):
                              stability=stability,
                              todays_mission=todays_mission,
                              current_filter=filter_type,
+                             last_backup=last_backup,
                              task_service=task_service)  # Pass task_service to template for score calculation
     
     @app.route('/add', methods=['POST'])
