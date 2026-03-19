@@ -1,13 +1,14 @@
 # app.py
 
 import os
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, send_file
 from database import db, migrate
 from config import Config
 from models.task_model import TaskModel
 from services.task_service import TaskService
 from repositories.sql_repository import SQLTaskRepository
 from services.reminder_service import check_due_tasks
+from services.backup_service import backup_tasks_to_csv
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
@@ -130,11 +131,12 @@ def create_app(config_class=Config):
         priority = request.form.get('priority', 'Medium')
         due_date = request.form.get('due_date')
         domain = request.form.get('domain', 'General')
+        repeat = request.form.get('repeat') or None  # Get repeat value, default to None if empty
         
         if title:
             try:
-                task_service.add_task(title, priority, due_date, domain)
-                print(f"✅ Task added: {title}")
+                task_service.add_task(title, priority, due_date, domain, repeat)
+                print(f"✅ Task added: {title} (repeat: {repeat})")
             except Exception as e:
                 print(f"❌ Error adding task: {e}")
         
@@ -177,8 +179,23 @@ def create_app(config_class=Config):
             'priority': t.priority,
             'due_date': t.due_date.strftime('%Y-%m-%d') if t.due_date else None,
             'domain': t.domain,
-            'completed': t.completed
+            'completed': t.completed,
+            'repeat': t.repeat
         } for t in tasks])
+    
+    @app.route('/backup')
+    def backup_tasks():
+        """Generate and download a CSV backup of all tasks"""
+        try:
+            filename = backup_tasks_to_csv()
+            # For download, you can either:
+            # Option 1: Return a download link
+            # return f"✅ Backup created: {filename}"
+            
+            # Option 2: Actually serve the file for download
+            return send_file(filename, as_attachment=True, download_name='tasks_backup.csv')
+        except Exception as e:
+            return f"❌ Backup failed: {e}"
     
     @app.route('/health')
     def health_check():
