@@ -5,5 +5,4 @@ python-dotenv==1.0.0
 gunicorn==21.2.0
 psycopg2==2.9.9
 APScheduler==3.10.4
-python-dateutil==2.8.2# Build dependencies for psycopg2
-# These will be installed by Render's build system
+python-dateutil==2.8.2
